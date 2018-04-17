@@ -30,7 +30,7 @@ wifikill.py [-h] [-k ip|mac [ip|mac ...] | -r ip|mac [ip|mac ...]
 :    kill all addresses in the LAN
 
 - `-ra`
-:    restore all addresseses
+:    restore all addresses
 
 - `-ig ip|mac [ip|mac ...]`
 :    ignore the addresses

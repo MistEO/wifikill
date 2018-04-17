@@ -93,6 +93,8 @@ if os.geteuid() != 0:
 # Search for stuff every time we refresh
 refreshing = True
 gateway_mac = '12:34:56:78:9A:BC'  # A default (bad) gateway mac address
+ignores = []
+
 while refreshing:
     refreshing = False
     # Use the current ip XXX.XXX.XXX.XXX and get a string in
@@ -130,10 +132,10 @@ while refreshing:
             'Gateway not found. Script will be UNABLE TO RESTORE WIFI once shutdown is over')
     printdiv()
 
-    ignores = args.ig
-    if ignores:
-        print('ignore list: {}'.format(ignores))
-    printdiv()
+    if args.ig:
+        ignores = args.ig
+        print('Ignore list: {}'.format(ignores))
+        printdiv()
 
     # Get a choice and keep prompting until we get a valid letter or a number
     # that is in range
@@ -144,6 +146,8 @@ while refreshing:
         for device in devices:
             if address == device[0] or address == devices[1]:
                 return device
+        print('No device like {}'.format(address))
+        return None
 
     if args.ka:
         kill_list = devices
@@ -152,11 +156,15 @@ while refreshing:
         kill_list = devices
     elif args.k:
         for address in args.k:
-            kill_list.append(get_victim)
+            victim = get_victim(address)
+            if victim:
+                kill_list.append(victim)
     elif args.r:
         kill = False
         for address in args.r:
-            kill_list.append(get_victim)
+            victim = get_victim(address)
+            if victim:
+                kill_list.append(victim)
     else:
         print('Who do you want to boot?')
         print('(r - Refresh, a - Kill all, ra - Restore all, q - quit)')
@@ -198,6 +206,9 @@ while refreshing:
 
             print('Please enter a valid choice')
 
+if len(kill_list) == 0:
+    print('No device to be killed, exit program')
+    exit()
 
 if kill:
     # If we have a number, loop the poison function until we get a

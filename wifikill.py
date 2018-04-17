@@ -171,7 +171,6 @@ while refreshing:
 
         while True:
             choice = input(">")
-            print(choice)
             assert isinstance(choice, str)
 
             def kill_append(num):

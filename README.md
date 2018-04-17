@@ -12,5 +12,31 @@ The program lists the devices connected to the network then allows you to:
 ## Usage
 
 ```bash
-wifikill.py [argument] [IP|MAC]
+wifikill.py [-h] [-k ip|mac [ip|mac ...] | -r ip|mac [ip|mac ...] 
+                    | -ka | -ra] [-ig ip|mac [ip|mac ...]] [--details] [--lan ip]
 ```
+
+### Arguments
+- `-h, --help`
+:    show this help message and exit
+
+- `-k ip|mac [ip|mac ...]`
+:    kill the addresses
+
+- `-r ip|mac [ip|mac ...]`
+:    restore the addresses
+
+- `-ka`
+:    kill all addresses in the LAN
+
+- `-ra`
+:    restore all addresseses
+
+- `-ig ip|mac [ip|mac ...]`
+:    ignore the addresses
+
+- `--details`
+:    show kill details
+
+- `--lan ip`
+:    manually specify the lan ip

@@ -13,7 +13,7 @@ The program lists the devices connected to the network then allows you to:
 
 ```bash
 wifikill.py [-h] [-k ip|mac [ip|mac ...] | -r ip|mac [ip|mac ...] 
-                    | -ka | -ra] [-ig ip|mac [ip|mac ...]] [--details] [--lan ip]
+                    | -ka | -ra] [-t second] [-ig ip|mac [ip|mac ...]] [--details] [--lan ip]
 ```
 
 ### Arguments
@@ -31,6 +31,9 @@ wifikill.py [-h] [-k ip|mac [ip|mac ...] | -r ip|mac [ip|mac ...]
 
 - `-ra`
 :    restore all addresses
+
+- `-t second`
+：   timing of kill
 
 - `-ig ip|mac [ip|mac ...]`
 :    ignore the addresses

